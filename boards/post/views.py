@@ -1,13 +1,14 @@
 from django.shortcuts import render, redirect
+from django.views.decorators.csrf import csrf_exempt
+
 from .models import Post
 from .forms import PostForm
 
-
-# Create your views here.
 def index(request):
     post_lists = Post.objects.all().order_by('-id')
     return render(request, 'index.html', {'posts' : post_lists})
 
+@csrf_exempt
 def post_write(request):
     if request.method == "GET":
         postForm = PostForm()
@@ -20,11 +21,11 @@ def post_write(request):
             post.writer = request.user
         return redirect('/detail/'+str(post.id))
 
+
 def post_detail(request, post_id):
     post = Post.objects.get(id=post_id)
 
     return render(request, 'post_detail.html',{'post' : post})
-
 def post_delete(request,post_id):
     post = Post.objects.get(id=post_id)
     if request.user != post.writer:
@@ -32,6 +33,7 @@ def post_delete(request,post_id):
     post.delete()
     return redirect('/')
 
+@csrf_exempt
 def post_update(request,bid):
     post = Post.objects.get(id=bid)
     if request.method == "GET" :
