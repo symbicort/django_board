@@ -1,3 +1,49 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from .models import Post
+from .forms import PostForm
+
 
 # Create your views here.
+def index(request):
+    post_lists = Post.objects.all().order_by('-id')
+    return render(request, 'index.html', {'posts' : post_lists})
+
+def post_write(request):
+    if request.method == "GET":
+        postForm = PostForm()
+        context = {'postForm' : postForm}
+        return render(request, 'post_write.html',context)
+    elif request.method == "POST":
+        postForm = PostForm(request.POST)
+        if postForm.is_valid():
+            post = postForm.save(commit=False)
+            post.writer = request.user
+        return redirect('/detail/'+str(post.id))
+
+def post_detail(request, post_id):
+    post = Post.objects.get(id=post_id)
+
+    return render(request, 'post_detail.html',{'post' : post})
+
+def post_delete(request,post_id):
+    post = Post.objects.get(id=post_id)
+    if request.user != post.writer:
+        return redirect('/')
+    post.delete()
+    return redirect('/')
+
+def post_update(request,bid):
+    post = Post.objects.get(id=bid)
+    if request.method == "GET" :
+        postForm = PostForm(instance=post)
+        context = {'postForm' : postForm}
+
+        return render(request,'post_write.html',context)
+
+    elif request.method == "POST" :
+        postForm = PostForm(request.POST, instance=post)
+        if postForm.is_valid():
+            post = postForm.save(commit=False)
+            post.save()
+
+        return redirect('/detail'+str(post.id))#

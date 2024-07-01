@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>post list</title>
+</head>
+<body>
+{% if request.user.is_authenticated%}
+로그인 한 사용자 : {{ request.user }} <br/>
+{% endif %}
+
+{% for posts in posts %}
+    {{ posts.id }}
+
+    <a href="detail/{{ posts.id }}"> {{ posts.contents }} </a>
+    {{ posts.writer }}
+<br/>
+{% endfor %}
+<a href="../write">게시글 작성</a>
+</body>
+</html>
