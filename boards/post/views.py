@@ -26,7 +26,7 @@ def post_write(request):
             post.author = request.user
             post.save()
         else:
-            print(postForm.errors)
+            print("에러 발생", postForm.errors, request.user)
         return redirect('/detail/' + str(post.id))
 
 
