@@ -51,7 +51,7 @@
                 <p>작성일자: {{ comment.created_at }}</p>
                 {% if comment.author == request.user %}
                     <a href="/comment/update">수정</a>
-                    <a href="/comment/delete">삭제</a>
+                    <a href="/comment/delete/{{ post.id }}/{{ comment.id }}">삭제</a>
                 {% endif %}
             </div>
         {% empty %}

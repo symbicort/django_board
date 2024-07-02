@@ -10,5 +10,5 @@ urlpatterns = [
 
     path('comment/write/<int:post_id>', comment_write),
     # path('comment/update', comment_update),
-    # path('comment/delete', comment_delete),
+    path('comment/delete/<int:post_id>/<int:comment_id>', comment_delete),
 ]

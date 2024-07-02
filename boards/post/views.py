@@ -76,3 +76,9 @@ def comment_write(request, post_id):
         return redirect('/detail/' + str(post.id))
     else:
         print("에러 발생", commentForm.errors)
+
+@login_required(login_url='/user/login')
+def comment_delete(request, post_id, comment_id):
+    comment = Comment.objects.get(id=comment_id)
+    comment.delete()
+    return redirect('/detail/' + str(post_id))
