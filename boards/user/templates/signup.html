@@ -2,12 +2,28 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>signup</title>
+    <title>Signup</title>
+    <style>
+        .error-box {
+            border: 1px solid red;
+            padding: 5px;
+            margin-bottom: 10px;
+        }
+    </style>
 </head>
 <body>
     <form method="post">
         {{ signupForm }}
-    <button>회원가입</button>
-</form>
+        {% for field in signupForm %}
+            {% if field.errors %}
+                <div class="error-box">
+                    {% for error in field.errors %}
+                        <p style="color: red;">{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endfor %}
+        <button>회원가입</button>
+    </form>
 </body>
 </html>

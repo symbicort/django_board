@@ -7,7 +7,13 @@
 <body>
 {% if request.user.is_authenticated%}
 로그인 한 사용자 : {{ request.user }} <br/>
+<a href="user/logout"> 로그아웃 </a>
+{% else %}
+<a href="user/login"> 로그인 </a>
+<a href="user/signup"> 회원가입 </a>
 {% endif %}
+
+<br/>
 
 {% for posts in posts %}
     {{ posts.id }}

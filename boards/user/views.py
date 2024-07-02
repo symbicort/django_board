@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login as auth_login, logout as auth_logout
 from django.views.decorators.csrf import csrf_exempt
-from .forms import SignupForm, LoginForm
 
+from .forms import SignupForm, LoginForm
 
 @csrf_exempt
 def signup(request):
@@ -14,6 +14,8 @@ def signup(request):
         if signupForm.is_valid():
             user = signupForm.save(commit=False)
             user.save()
+        else:
+            print("로그인 실패" + str(signupForm.is_valid()))
 
         return redirect('/')
 
@@ -29,7 +31,6 @@ def login(request):
             return redirect('/')
 
 def logout(request):
-    # 세션 정보를 지우는 것
     auth_logout(request)
     return redirect('/')
 
