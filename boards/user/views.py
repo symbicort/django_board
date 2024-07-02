@@ -8,16 +8,14 @@ from .forms import SignupForm, LoginForm
 def signup(request):
     if request.method == "GET":
         signupForm = SignupForm()
-        return render(request,'signup.html', {'signupForm' : signupForm})
+        return render(request, 'signup.html', {'signupForm': signupForm})
     elif request.method == "POST":
         signupForm = SignupForm(request.POST)
         if signupForm.is_valid():
-            user = signupForm.save(commit=False)
-            user.save()
+            signupForm.save()
+            return redirect('/user/login')
         else:
-            print("로그인 실패" + str(signupForm.is_valid()))
-
-        return redirect('/')
+            return render(request, 'signup.html', {'signupForm': signupForm})
 
 @csrf_exempt
 def login(request):
@@ -29,6 +27,8 @@ def login(request):
         if loginForm.is_valid():
             auth_login(request, loginForm.get_user())
             return redirect('/')
+        else:
+            return render(request, 'login.html', {'loginForm' : loginForm})
 
 def logout(request):
     auth_logout(request)

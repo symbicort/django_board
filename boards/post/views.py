@@ -24,7 +24,6 @@ def post_write(request):
         if postForm.is_valid():
             post = postForm.save(commit=False)
             post.author = request.user
-            print("에러 발생 전 데이터 확인", post)
             post.save()
         else:
             print("에러 발생", postForm.errors, request.user)
@@ -39,15 +38,15 @@ def post_detail(request, post_id):
 
 def post_delete(request, post_id):
     post = Post.objects.get(id=post_id)
-    if request.user != post.writer:
+    if request.user != post.author:
         return redirect('/')
     post.delete()
     return redirect('/')
 
 
 @csrf_exempt
-def post_update(request, bid):
-    post = Post.objects.get(id=bid)
+def post_update(request, post_id):
+    post = Post.objects.get(id=post_id)
     if request.method == "GET":
         postForm = PostForm(instance=post)
         context = {'postForm': postForm}
@@ -60,4 +59,4 @@ def post_update(request, bid):
             post = postForm.save(commit=False)
             post.save()
 
-        return redirect('/detail' + str(post.id))  #
+        return redirect('/detail' + int(post.id))
