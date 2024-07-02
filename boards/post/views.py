@@ -2,8 +2,8 @@ from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 
-from .models import Post
-from .forms import PostForm
+from .models import Post, Comment
+from .forms import PostForm, CommentForm
 
 
 def index(request):
@@ -32,8 +32,10 @@ def post_write(request):
 
 def post_detail(request, post_id):
     post = Post.objects.get(id=post_id)
+    comments = Comment.objects.filter(post=post).order_by('-created_at')
+    commentForm = CommentForm()
 
-    return render(request, 'post_detail.html', {'post': post})
+    return render(request, 'post_detail.html', {'post': post, 'comments': comments, 'commentForm' : commentForm })
 
 
 def post_delete(request, post_id):
@@ -60,3 +62,17 @@ def post_update(request, post_id):
             post.save()
 
         return redirect('/detail' + int(post.id))
+
+@login_required(login_url='/user/login')
+@csrf_exempt
+def comment_write(request, post_id):
+    commentForm = CommentForm(request.POST)
+    if(commentForm.is_valid()):
+        comment = commentForm.save(commit=False)
+        post = Post.objects.get(id=post_id)
+        comment.post = post
+        comment.author = request.user
+        comment.save()
+        return redirect('/detail/' + str(post.id))
+    else:
+        print("에러 발생", commentForm.errors)

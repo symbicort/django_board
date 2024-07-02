@@ -19,10 +19,11 @@ class Comment(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     author = models.ForeignKey(User, null=True,blank=True,on_delete=models.SET_NULL)
 
+    def __str__(self):
+        return self.content
     class Meta:
         db_table = 'comment'
 
-    def __str__(self):
-        return self.content
+
 
 

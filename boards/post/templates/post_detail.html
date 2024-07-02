@@ -2,46 +2,61 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>detail</title>
-     <style>
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        th, td {
+    <title>Detail</title>
+    <style>
+        .comment-box {
             border: 1px solid #ccc;
-            padding: 8px;
-            text-align: left;
+            margin-bottom: 10px;
+            padding: 10px;
         }
-        th {
-            background-color: #f2f2f2;
+
+        label {
+            display: inline-block;
+            width: 80px;
+            vertical-align: top;
         }
     </style>
 </head>
 <body>
-    <table>
-        <thead>
-            <tr>
-                <th>제목</th>
-                <th>내용</th>
-                <th>작성자</th>
-                <th>작성일자</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td> {{ post.title }}</td>
-                <td>{{ post.contents }}</td>
-                <td>{{ post.author.username }}</td>
-                <td>{{ post.created_at }}</td>
-            </tr>
-        </tbody>
-    </table> <br/>
-    <a href="/">목록</a> <br/>
-    {% if post.author == request.user %}
-        <a href="/update/{{post.id}}">수정</a>
-        <a href="/delete/{{post.id}}">삭제</a>
-    {% endif %}
+    <div>
+        <h1>{{ post.title }}</h1>
+        <p>{{ post.contents }}</p>
+        <p>작성자: {{ post.author.username }}</p>
+        <p>작성일자: {{ post.created_at }}</p>
+        <a href="/">목록으로 돌아가기</a>
+        {% if post.author == request.user %}
+            <a href="/update/{{ post.id }}">수정</a>
+            <a href="/delete/{{ post.id }}">삭제</a>
+        {% endif %}
+    </div>
 
+    <div>
+        {% if user.is_authenticated %}
+        <form method="post" action="/comment/write/{{ post.id }}">
+            {{ commentForm.as_p }}
+            <button type="submit">댓글 작성</button>
+        </form>
+    {% else %}
+        <p>댓글을 작성하려면 로그인이 필요합니다.</p>
+        <a href="/login">로그인</a>
+    {% endif %}
+    </div>
+
+    <div>
+        <h2>댓글 목록</h2>
+        {% for comment in comments %}
+            <div class="comment-box">
+                <p>내용: {{ comment.content }}</p>
+                <p>작성자: {{ comment.author }}</p>
+                <p>작성일자: {{ comment.created_at }}</p>
+                {% if comment.author == request.user %}
+                    <a href="/comment/update">수정</a>
+                    <a href="/comment/delete">삭제</a>
+                {% endif %}
+            </div>
+        {% empty %}
+            <p>댓글이 없습니다.</p>
+        {% endfor %}
+    </div>
 </body>
 </html>
