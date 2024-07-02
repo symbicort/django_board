@@ -20,10 +20,11 @@ def post_write(request):
         return render(request, 'post_write.html', context)
     elif request.method == "POST":
         postForm = PostForm(request.POST)
-        print(postForm.is_valid())
+        print(request.user)
         if postForm.is_valid():
             post = postForm.save(commit=False)
             post.author = request.user
+            print("에러 발생 전 데이터 확인", post)
             post.save()
         else:
             print("에러 발생", postForm.errors, request.user)
