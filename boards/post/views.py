@@ -2,8 +2,8 @@ from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 
-from .models import Post
-from .forms import PostForm
+from .models import Post, Comment
+from .forms import PostForm, CommentForm
 
 
 def index(request):
@@ -12,7 +12,6 @@ def index(request):
 
 
 @login_required(login_url='/user/login')
-@csrf_exempt
 def post_write(request):
     if request.method == "GET":
         postForm = PostForm()
@@ -20,7 +19,7 @@ def post_write(request):
         return render(request, 'post_write.html', context)
     elif request.method == "POST":
         postForm = PostForm(request.POST)
-        print(postForm.is_valid())
+        print(request.user)
         if postForm.is_valid():
             post = postForm.save(commit=False)
             post.author = request.user
@@ -32,21 +31,21 @@ def post_write(request):
 
 def post_detail(request, post_id):
     post = Post.objects.get(id=post_id)
+    comments = Comment.objects.filter(post=post).order_by('-created_at')
 
-    return render(request, 'post_detail.html', {'post': post})
+    return render(request, 'post_detail.html', {'post': post, 'comments': comments, 'commentForm' : CommentForm() })
 
 
 def post_delete(request, post_id):
     post = Post.objects.get(id=post_id)
-    if request.user != post.writer:
+    if request.user != post.author:
         return redirect('/')
     post.delete()
     return redirect('/')
 
 
-@csrf_exempt
-def post_update(request, bid):
-    post = Post.objects.get(id=bid)
+def post_update(request, post_id):
+    post = Post.objects.get(id=post_id)
     if request.method == "GET":
         postForm = PostForm(instance=post)
         context = {'postForm': postForm}
@@ -59,4 +58,31 @@ def post_update(request, bid):
             post = postForm.save(commit=False)
             post.save()
 
-        return redirect('/detail' + str(post.id))  #
+        return redirect('/detail/' + str(post.id))
+
+@login_required(login_url='/user/login')
+def comment_write(request, post_id):
+    commentForm = CommentForm(request.POST)
+    if(commentForm.is_valid()):
+        comment = commentForm.save(commit=False)
+        post = Post.objects.get(id=post_id)
+        comment.post = post
+        comment.author = request.user
+        comment.save()
+        return redirect('/detail/' + str(post.id))
+    else:
+        print("에러 발생", commentForm.errors)
+
+@login_required(login_url='/user/login')
+def comment_delete(request, comment_id):
+    comment = Comment.objects.get(id=comment_id)
+    comment.delete()
+    return redirect('/detail/' + str(comment.post.id))
+
+@login_required(login_url='/user/login')
+def comment_update(request, comment_id):
+    comment = Comment.objects.get(id=comment_id)
+    commentForm = CommentForm(request.POST, instance=comment)
+    commentForm.post = comment.post
+    commentForm.save()
+    return redirect('/detail/' + str(comment.post.id))

@@ -13,7 +13,15 @@
 </head>
 <body>
     <form method="post">
-        {{ signupForm }}
+        {% csrf_token %}
+        {{ signupForm.as_p }}
+        {% if signupForm.non_field_errors %}
+            <div class="error-box">
+                {% for error in signupForm.non_field_errors %}
+                    <p style="color: red;">{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
         {% for field in signupForm %}
             {% if field.errors %}
                 <div class="error-box">

@@ -3,10 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <title>Login</title>
+    <style>
+        .error-box {
+            border: 1px solid red;
+            padding: 5px;
+            margin-bottom: 10px;
+        }
+    </style>
 </head>
 <body>
     <form method="post">
-        {{ loginForm }}
+        {% csrf_token %}
+        {{ loginForm.as_p }}
+        {% if loginForm.non_field_errors %}
+            <div class="error-box">
+                {% for error in loginForm.non_field_errors %}
+                    <p style="color: red;">{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+        {% for field in loginForm %}
+            {% if field.errors %}
+                <div class="error-box">
+                    {% for error in field.errors %}
+                        <p style="color: red;">{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endfor %}
         <button>로그인</button>
     </form>
 </body>

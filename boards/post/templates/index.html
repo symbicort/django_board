@@ -3,6 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <title>post list</title>
+        <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
 </head>
 <body>
 {% if request.user.is_authenticated%}
@@ -15,13 +29,28 @@
 
 <br/>
 
-{% for posts in posts %}
-    {{ posts.id }}
-
-    <a href="detail/{{ posts.id }}"> {{ posts.contents }} </a>
-    {{ posts.writer }}
-<br/>
-{% endfor %}
+<h2>게시글 목록</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>제목</th>
+                <th>내용</th>
+                <th>작성자</th>
+                <th>작성일자</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for post in posts %}
+            <tr>
+                <td> <a href="detail/{{ post.id }}">{{ post.title }}</a></td>
+                <td>{{ post.contents }}</td>
+                <td>{{ post.author.username }}</td>
+                <td>{{ post.created_at }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <br/>
 <a href="../write">게시글 작성</a>
 </body>
 </html>
