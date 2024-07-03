@@ -31,13 +31,17 @@
         <a href="/">목록으로 돌아가기</a>
         {% if post.author == request.user %}
             <a href="/update/{{ post.id }}">수정</a>
-            <a href="/delete/{{ post.id }}">삭제</a>
+            <form method="post" action="/delete/{{ post.id }}">
+                {% csrf_token %}
+                <button type="submit">삭제</button>
+            </form>
         {% endif %}
     </div>
 
     <div>
         {% if user.is_authenticated %}
         <form method="post" action="/comment/write/{{ post.id }}">
+            {% csrf_token %}
             {{ commentForm.as_p }}
             <button type="submit">댓글 작성</button>
         </form>
@@ -57,9 +61,11 @@
                 {% if comment.author == request.user %}
                     <button class="edit-link" data-comment-id="{{ comment.id }}">수정</button>
                     <form action="/comment/delete/{{ comment.id }}" method="post">
+                        {% csrf_token %}
                         <button type="submit">삭제</button>
                     </form>
                     <form id="edit-form-{{ comment.id }}" class="edit-form" method="post" action="/comment/update/{{ comment.id }}">
+                        {% csrf_token %}
                         <label for="id_content">내용:</label>
                         <textarea id="id_content" name="content" rows="3" cols="40">{{ comment.content }}</textarea>
                         <button type="submit">저장</button>

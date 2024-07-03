@@ -12,7 +12,6 @@ def index(request):
 
 
 @login_required(login_url='/user/login')
-@csrf_exempt
 def post_write(request):
     if request.method == "GET":
         postForm = PostForm()
@@ -33,9 +32,8 @@ def post_write(request):
 def post_detail(request, post_id):
     post = Post.objects.get(id=post_id)
     comments = Comment.objects.filter(post=post).order_by('-created_at')
-    commentForm = CommentForm()
 
-    return render(request, 'post_detail.html', {'post': post, 'comments': comments, 'commentForm' : commentForm })
+    return render(request, 'post_detail.html', {'post': post, 'comments': comments, 'commentForm' : CommentForm() })
 
 
 def post_delete(request, post_id):
@@ -46,7 +44,6 @@ def post_delete(request, post_id):
     return redirect('/')
 
 
-@csrf_exempt
 def post_update(request, post_id):
     post = Post.objects.get(id=post_id)
     if request.method == "GET":
@@ -61,10 +58,9 @@ def post_update(request, post_id):
             post = postForm.save(commit=False)
             post.save()
 
-        return redirect('/detail' + int(post.id))
+        return redirect('/detail/' + str(post.id))
 
 @login_required(login_url='/user/login')
-@csrf_exempt
 def comment_write(request, post_id):
     commentForm = CommentForm(request.POST)
     if(commentForm.is_valid()):
@@ -78,14 +74,12 @@ def comment_write(request, post_id):
         print("에러 발생", commentForm.errors)
 
 @login_required(login_url='/user/login')
-@csrf_exempt
 def comment_delete(request, comment_id):
     comment = Comment.objects.get(id=comment_id)
     comment.delete()
     return redirect('/detail/' + str(comment.post.id))
 
 @login_required(login_url='/user/login')
-@csrf_exempt
 def comment_update(request, comment_id):
     comment = Comment.objects.get(id=comment_id)
     commentForm = CommentForm(request.POST, instance=comment)
