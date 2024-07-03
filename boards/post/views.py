@@ -78,7 +78,17 @@ def comment_write(request, post_id):
         print("에러 발생", commentForm.errors)
 
 @login_required(login_url='/user/login')
-def comment_delete(request, post_id, comment_id):
+@csrf_exempt
+def comment_delete(request, comment_id):
     comment = Comment.objects.get(id=comment_id)
     comment.delete()
-    return redirect('/detail/' + str(post_id))
+    return redirect('/detail/' + str(comment.post.id))
+
+@login_required(login_url='/user/login')
+@csrf_exempt
+def comment_update(request, comment_id):
+    comment = Comment.objects.get(id=comment_id)
+    commentForm = CommentForm(request.POST, instance=comment)
+    commentForm.post = comment.post
+    commentForm.save()
+    return redirect('/detail/' + str(comment.post.id))

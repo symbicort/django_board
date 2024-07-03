@@ -10,6 +10,11 @@
             padding: 10px;
         }
 
+        .edit-form {
+            display: none;
+            margin-top: 10px;
+        }
+
         label {
             display: inline-block;
             width: 80px;
@@ -36,27 +41,75 @@
             {{ commentForm.as_p }}
             <button type="submit">댓글 작성</button>
         </form>
-    {% else %}
+        {% else %}
         <p>댓글을 작성하려면 로그인이 필요합니다.</p>
-        <a href="/login">로그인</a>
-    {% endif %}
+        <a href="/user/login">로그인</a>
+        {% endif %}
     </div>
 
     <div>
         <h2>댓글 목록</h2>
         {% for comment in comments %}
-            <div class="comment-box">
-                <p>내용: {{ comment.content }}</p>
+            <div class="comment-box" id="comment-{{ comment.id }}">
+                <p id="content-{{ comment.id }}">내용: {{ comment.content }}</p>
                 <p>작성자: {{ comment.author }}</p>
                 <p>작성일자: {{ comment.created_at }}</p>
                 {% if comment.author == request.user %}
-                    <a href="/comment/update">수정</a>
-                    <a href="/comment/delete/{{ post.id }}/{{ comment.id }}">삭제</a>
+                    <button class="edit-link" data-comment-id="{{ comment.id }}">수정</button>
+                    <form action="/comment/delete/{{ comment.id }}" method="post">
+                        <button type="submit">삭제</button>
+                    </form>
+                    <form id="edit-form-{{ comment.id }}" class="edit-form" method="post" action="/comment/update/{{ comment.id }}">
+                        <label for="id_content">내용:</label>
+                        <textarea id="id_content" name="content" rows="3" cols="40">{{ comment.content }}</textarea>
+                        <button type="submit">저장</button>
+                    </form>
                 {% endif %}
             </div>
         {% empty %}
             <p>댓글이 없습니다.</p>
         {% endfor %}
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.edit-link').forEach(link => {
+                link.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    const commentId = this.getAttribute('data-comment-id');
+                    const contentElement = document.getElementById(`content-${commentId}`);
+                    const editForm = document.getElementById(`edit-form-${commentId}`);
+
+                    if (editForm.style.display === 'block') {
+                        contentElement.style.display = 'block';
+                        editForm.style.display = 'none';
+                    } else {
+                        document.querySelectorAll('.edit-form').forEach(form => {
+                            form.style.display = 'none';
+                        });
+
+                        document.querySelectorAll('.comment-box p[id^="content-"]').forEach(content => {
+                            content.style.display = 'block';
+                        });
+
+                        contentElement.style.display = 'none';
+                        editForm.style.display = 'block';
+                    }
+                });
+            });
+
+            document.querySelectorAll('.edit-form button[type="submit"]').forEach(button => {
+                button.addEventListener('click', function() {
+                    const commentId = this.closest('form').getAttribute('id').replace('edit-form-', '');
+                    const contentElement = document.getElementById(`content-${commentId}`);
+
+                    this.closest('.edit-form').style.display = 'none';
+
+                    contentElement.innerHTML = `내용: ${this.form.querySelector('textarea').value}`;
+                    contentElement.style.display = 'block';
+                });
+            });
+        });
+    </script>
 </body>
 </html>

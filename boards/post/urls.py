@@ -9,6 +9,6 @@ urlpatterns = [
     path('update/<int:post_id>',post_update),
 
     path('comment/write/<int:post_id>', comment_write),
-    # path('comment/update', comment_update),
-    path('comment/delete/<int:post_id>/<int:comment_id>', comment_delete),
+    path('comment/update/<int:comment_id>', comment_update),
+    path('comment/delete/<int:comment_id>', comment_delete),
 ]
