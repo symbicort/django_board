@@ -6,6 +6,7 @@ from .models import Post, Comment
 from .forms import PostForm, CommentForm
 
 
+
 def index(request):
     post_lists = Post.objects.all().order_by('-id')
     return render(request, 'index.html', {'posts': post_lists})
